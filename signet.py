@@ -6,9 +6,6 @@ import operator
 import numpy as np
 import random
 from py_signet import py_signet
-from sklearn import linear_model
-from sklearn.metrics import f1_score
-from sklearn.model_selection import train_test_split
 
 
 data_dir = 'data'
@@ -168,7 +165,6 @@ def random_walk(graph, start_node, size):
             selected_node = weighted_pick(weights)
         if selected_node == -1:
             return ret
-        '''if selected_node not in ret:'''
         ret.append(selected_node)
         next_node = selected_node
 
@@ -209,7 +205,6 @@ if __name__ == '__main__':
     test_size = 0.5
     print 'data loaded'
     all_vertices = np.arange(0, n_vertices).tolist()
-    train_nodes, test_nodes = train_test_split(all_vertices, test_size=test_size, random_state=random.randint(10, 100))
     signed_network, unsigned_network = construct_network(edges, all_vertices, all_vertices)
     # print 'graph is ' + str(nx.is_connected(unsigned_network))
 
