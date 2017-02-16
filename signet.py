@@ -1,7 +1,5 @@
 import networkx as nx
 import os
-import math
-import cPickle as pickle
 import operator
 import numpy as np
 import random
