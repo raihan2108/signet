@@ -8,13 +8,14 @@ from py_signet import py_signet
 
 data_dir = 'data'
 # dataset_name = 'scotus'
-dataset_name = 'adj_network'
+dataset_name = 'tribe'
+
 if dataset_name == 'scotus':
     n_vertices = 28305
-    label_file = 'scotus_label.txt'
 elif dataset_name == 'adj_network':
     n_vertices = 4579
-    label_file = 'adj_label.txt'
+elif dataset_name == 'tribe':
+    n_vertices = 16
 
 threshold = 5
 
@@ -129,7 +130,7 @@ def get_edges(dataset_name):
             source, destination, sign = map(int, line.split())
             if sign == 0:
                 sign = -1
-            edges.append((source, destination, sign))
+            edges.append((source - 1, destination - 1, sign))
     return edges
 
 
@@ -169,38 +170,8 @@ def random_walk(graph, start_node, size):
     return ret
 
 
-def get_labels():
-    if dataset_name == 'scotus':
-        data_path = os.path.join(data_dir, label_file)
-        issue_label = np.zeros(n_vertices)
-        pol_label = np.zeros(n_vertices)
-        with open(data_path) as l_file:
-            for line in l_file:
-                node, pol, issue = map(int, line.split())
-                pol_label[node] = pol
-                issue_label[node] = issue
-
-        return pol_label, issue_label
-    elif dataset_name == 'adj_network':
-        data_path = os.path.join(data_dir, label_file)
-        adj_label = np.zeros(n_vertices)
-        with open(data_path) as l_file:
-            for i, line in enumerate(l_file):
-                if line.strip() == 'p':
-                    adj_label[i] = 1
-                elif line.strip() == 'n':
-                    adj_label[i] = 2
-        return adj_label
-
-
 if __name__ == '__main__':
     edges = get_edges(dataset_name + '.txt')
-    if dataset_name == 'scotus':
-        y_pol, y_issue = get_labels()
-    elif dataset_name == 'adj_network':
-        y_pol = get_labels()
-
-    test_size = 0.5
     print 'data loaded'
     all_vertices = np.arange(0, n_vertices).tolist()
     signed_network, unsigned_network = construct_network(edges, all_vertices, all_vertices)
@@ -238,11 +209,11 @@ if __name__ == '__main__':
         edge_weight[i] = ww['weight']
         i += 1
     total_samples = 100
-    n_dims = 20
+    n_dims = 2
     n_iterations = 10
     n_negatives = 5
     init_rho = 0.025
-    order = 2
+    order = 1
     is_neg_sampling = False
 
     node_embeddings = np.zeros(n_vertices * n_dims, dtype=np.float)
@@ -268,3 +239,22 @@ if __name__ == '__main__':
             for j in xrange(0, n_dims):
                 final_emb[i][j] = node_emb[i][j]
 
+    data_path = os.path.join(data_dir, 'tribe_id.txt')
+    tribe_name = {}
+    with open(data_path) as l_file:
+        for i, line in enumerate(l_file):
+            tribe_name[i] = line.strip()
+
+    Y = final_emb
+    tribe_net = nx.DiGraph()
+    for node in signed_network.nodes():
+        tribe_net.add_node(node, label=tribe_name[node],
+                           pos_x=float(Y[node][0]), pos_y=float(Y[node][1]))
+
+    for edge in signed_network.edges(data=True):
+        if edge[2]['weight'] > 0:
+            weight = 1
+        else:
+            weight = 2
+        tribe_net.add_edge(edge[0], edge[1], partition=weight)
+    nx.write_graphml(tribe_net, 'tribe_net.graphml')
