@@ -258,17 +258,3 @@ if __name__ == '__main__':
             weight = 2
         tribe_net.add_edge(edge[0], edge[1], partition=weight)
     nx.write_graphml(tribe_net, 'tribe_net.graphml')
-
-    '''import matplotlib.pylab as plt
-    plt.scatter(Y[:, 0], Y[:, 1])
-
-    for label, x, y in zip(tribe_name.values(), Y[:, 0], Y[:, 1]):
-        plt.annotate(
-            label,
-            xy=(x, y), xytext=(-20, 20),
-            textcoords='offset points', ha='right', va='bottom',
-            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-            arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
-
-
-    plt.show()'''
