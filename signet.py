@@ -87,7 +87,7 @@ def sample_nodes(walks, network):
     return samp, samn
 
 
-def construct_network(edges, all_vertices, train_nodes):
+def construct_network(edges, all_vertices, train_node):
     directed_network = nx.DiGraph()
     undirected_network = nx.Graph()
     count = 0
@@ -98,17 +98,14 @@ def construct_network(edges, all_vertices, train_nodes):
         source = edge[0]
         destination = edge[1]
         sign = edge[2]
-
-        if source in train_nodes:
-
-            if undirected_network.has_edge(source, destination):
-                undirected_network[source][destination]['weight'] += sign
-            else:
-                undirected_network.add_edge(source, destination, weight=sign)
-            if directed_network.has_edge(source, destination):
-                directed_network[source][destination]['weight'] += sign
-            else:
-                directed_network.add_edge(source, destination, weight=sign)
+        if undirected_network.has_edge(source, destination):
+            undirected_network[source][destination]['weight'] += sign
+        else:
+            undirected_network.add_edge(source, destination, weight=sign)
+        if directed_network.has_edge(source, destination):
+            directed_network[source][destination]['weight'] += sign
+        else:
+            directed_network.add_edge(source, destination, weight=sign)
     return directed_network, undirected_network
 
 
