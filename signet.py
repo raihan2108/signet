@@ -88,12 +88,12 @@ def sample_nodes(walks, network):
 
 
 def construct_network(edges, all_vertices, train_nodes):
-    signed_network = nx.DiGraph()
-    unsigned_network = nx.Graph()
+    directed_network = nx.DiGraph()
+    undirected_network = nx.Graph()
     count = 0
     for v in all_vertices:
-        signed_network.add_node(v)
-        unsigned_network.add_node(v)
+        directed_network.add_node(v)
+        undirected_network.add_node(v)
     for i, edge in enumerate(edges):
         source = edge[0]
         destination = edge[1]
@@ -101,18 +101,18 @@ def construct_network(edges, all_vertices, train_nodes):
 
         if source in train_nodes:
 
-            if unsigned_network.has_edge(source, destination):
-                unsigned_network[source][destination]['weight'] += sign
+            if undirected_network.has_edge(source, destination):
+                undirected_network[source][destination]['weight'] += sign
             else:
-                unsigned_network.add_edge(source, destination, weight=sign)
-            if signed_network.has_edge(source, destination):
-                signed_network[source][destination]['weight'] += sign
-                if signed_network[source][destination]['weight'] == 0:
+                undirected_network.add_edge(source, destination, weight=sign)
+            if directed_network.has_edge(source, destination):
+                directed_network[source][destination]['weight'] += sign
+                if directed_network[source][destination]['weight'] == 0:
                     count += 1
                     print'error'
             else:
-                signed_network.add_edge(source, destination, weight=sign)
-    return signed_network, unsigned_network
+                directed_network.add_edge(source, destination, weight=sign)
+    return directed_network, undirected_network
 
 
 def get_edges(dataset_name):
@@ -169,12 +169,12 @@ if __name__ == '__main__':
     edges = get_edges(dataset_name + '.txt')
     print 'data loaded'
     all_vertices = np.arange(0, n_vertices).tolist()
-    signed_network, unsigned_network = construct_network(edges, all_vertices, all_vertices)
+    directed_network, undirected_network = construct_network(edges, all_vertices, all_vertices)
     # print 'graph is ' + str(nx.is_connected(unsigned_network))
 
     print 'network constructed'
 
-    nodes_by_degree_centrality = nx.degree_centrality(signed_network)
+    nodes_by_degree_centrality = nx.degree_centrality(directed_network)
     sorted_by_degree_centrality = sorted(nodes_by_degree_centrality.items(), key=operator.itemgetter(1), reverse=True)
 
     total_walks = n_vertices
@@ -183,22 +183,22 @@ if __name__ == '__main__':
         current_node = sorted_by_degree_centrality[i][0]
         walks[current_node] = []
         for n in xrange(0, 1):
-            walk = random_walk(signed_network, start_node=current_node, size=5)
+            walk = random_walk(directed_network, start_node=current_node, size=5)
             walks[current_node].append(walk)
 
         if i != 0 and i % 10000 == 0:
             print("done for " + str(i) + " th node")
 
-    samp, samn = sample_nodes(walks, signed_network)
+    samp, samn = sample_nodes(walks, directed_network)
     print 'node sampling completed'
 
-    n_edges = signed_network.number_of_edges()
+    n_edges = directed_network.number_of_edges()
     edge_source = np.zeros(n_edges, dtype=np.int)
     edge_target = np.zeros(n_edges, dtype=np.int)
     edge_weight = np.zeros(n_edges, dtype=np.int)
 
     i = 0
-    for uu, vv, ww in signed_network.edges(data=True):
+    for uu, vv, ww in directed_network.edges(data=True):
         edge_source[i] = uu
         edge_target[i] = vv
         edge_weight[i] = ww['weight']
@@ -242,11 +242,11 @@ if __name__ == '__main__':
 
     Y = final_emb
     tribe_net = nx.Graph()
-    for node in signed_network.nodes():
+    for node in directed_network.nodes():
         tribe_net.add_node(node, label=tribe_name[node],
                            pos_x=float(Y[node][0]), pos_y=float(Y[node][1]))
 
-    for edge in signed_network.edges(data=True):
+    for edge in directed_network.edges(data=True):
         if edge[2]['weight'] > 0:
             weight = 1
         else:
