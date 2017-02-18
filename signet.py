@@ -246,7 +246,7 @@ if __name__ == '__main__':
             tribe_name[i] = line.strip()
 
     Y = final_emb
-    tribe_net = nx.DiGraph()
+    tribe_net = nx.Graph()
     for node in signed_network.nodes():
         tribe_net.add_node(node, label=tribe_name[node],
                            pos_x=float(Y[node][0]), pos_y=float(Y[node][1]))
