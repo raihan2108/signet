@@ -7,7 +7,6 @@ from py_signet import py_signet
 
 
 data_dir = 'data'
-# dataset_name = 'scotus'
 dataset_name = 'tribe'
 
 if dataset_name == 'tribe':
