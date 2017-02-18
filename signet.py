@@ -10,11 +10,7 @@ data_dir = 'data'
 # dataset_name = 'scotus'
 dataset_name = 'tribe'
 
-if dataset_name == 'scotus':
-    n_vertices = 28305
-elif dataset_name == 'adj_network':
-    n_vertices = 4579
-elif dataset_name == 'tribe':
+if dataset_name == 'tribe':
     n_vertices = 16
 
 threshold = 5
