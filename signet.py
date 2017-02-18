@@ -107,9 +107,6 @@ def construct_network(edges, all_vertices, train_nodes):
                 undirected_network.add_edge(source, destination, weight=sign)
             if directed_network.has_edge(source, destination):
                 directed_network[source][destination]['weight'] += sign
-                if directed_network[source][destination]['weight'] == 0:
-                    count += 1
-                    print'error'
             else:
                 directed_network.add_edge(source, destination, weight=sign)
     return directed_network, undirected_network
