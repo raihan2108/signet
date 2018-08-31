@@ -1,11 +1,9 @@
 SIGNet requires python >=2.7 with cython, networkx and pickle package.
 You will also need C++ GSL library to build the code.
 
-Building the code 
-`python setup.py build_ext --inplace`
+Building the code: `python setup.py build_ext --inplace`
 
-Running code
-`python signet.y`
+Running code: `python signet.py`
 
 Make sure to add GSL library path in the `setup.py`. Headers files usually are in `/usr/local/include/` and library files are in `/usr/local/lib/` 
 
